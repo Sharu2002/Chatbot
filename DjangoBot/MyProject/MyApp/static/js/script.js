@@ -13,7 +13,7 @@ class Chatbox {
     display() {
         const {openButton, chatBox, sendButton} = this.args;
         
-
+        //chatbox.classList.add('chatbox--active')
         openButton.addEventListener('click', () => this.toggleState(chatBox))
 
         sendButton.addEventListener('click', () => this.onSendButton(chatBox))
@@ -37,39 +37,53 @@ class Chatbox {
         }
     }
 
-    onSendButton(chatbox) {
-        var textField = chatbox.querySelector('input');
-        let text1 = textField.value
-        if (text1 === "") {
-            return;
-        }
+    
+onSendButton(chatbox)
+{
+       console.log("Hello World");  
+       var textField = chatbox.querySelector('input');
+       let text1 = textField.value
+       
+       console.log(text1);
+       if (text1 === "")
+        {
+           return;
+       }
+       let msg1 = { name: "User", message: text1 }
+       this.messages.push(msg1);
+   
+       fetch('http://127.0.0.1:8000/', 
+           {
+           method: 'POST',
+           body: JSON.stringify({ message: text1 }),
+           headers: {
+             'Content-Type': 'application/json'
+           },
 
-        let msg1 = { name: "User", message: text1 }
-        this.messages.push(msg1);
+         }).then(function(data)
+           {
+           data.text().then(text => console.log(text));
+               
+               let msg2 = { name: "Sam", message: text };
 
-        fetch('http://127.0.0.1:8000/predict', {
-            method: 'POST',
-            body: JSON.stringify({ message: text1 }),
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-          })
-          .then(r => r.json())
-          .then(r => {
-            let msg2 = { name: "Sam", message: r.answer };
-            this.messages.push(msg2);
+           this.messages.push(msg2);
+             console.log(msg2);
             this.updateChatText(chatbox)
             textField.value = ''
-
-        }).catch((error) => {
-            console.error('Error:', error);
+           
+         })
+           .catch((error) => {
+           console.error('Error:', error);
             this.updateChatText(chatbox)
             textField.value = ''
-          });
-    }
+         });
+         
+   }
+
+
 
     updateChatText(chatbox) {
+       
         var html = '';
         this.messages.slice().reverse().forEach(function(item, index) {
             if (item.name === "Sam")
@@ -82,6 +96,7 @@ class Chatbox {
             }
           });
 
+         
         const chatmessage = chatbox.querySelector('.chatbox__messages');
         chatmessage.innerHTML = html;
     }
